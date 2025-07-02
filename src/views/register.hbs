@@ -1,0 +1,126 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daftar Akun</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/assets/css/style.css" />
+    <style>
+      body { background-image: url('image/bg-form.jpg'); background-size: cover;
+      background-position: center; background-repeat: no-repeat;
+      background-attachment: fixed; min-height: 100vh; font-family: 'Inter',
+      sans-serif; } #register-form-container { opacity: 0; transform:
+      translateY(30px); transition: opacity 1.5s ease-out, transform 1.5s
+      ease-out; } #register-form-container.visible-form { opacity: 1; transform:
+      translateY(0); } #register-form-container.hidden-form { opacity: 0;
+      transform: translateY(30px); } /* Styling Tombol Register (mirip
+      Instagram) */ .instagram-button { background-color: #0095f6; /* Warna biru
+      Instagram */ } .instagram-button:hover { background-color: #007acb; /*
+      Warna biru sedikit lebih gelap saat hover */ } /* Message Box */
+      .message-box { position: fixed; top: 20px; left: 50%; transform:
+      translateX(-50%); background-color: #4CAF50; /* Warna hijau untuk sukses
+      */ color: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px
+      8px rgba(0, 0, 0, 0.2); z-index: 1000; display: none; /* Hidden by default
+      */ opacity: 0; transition: opacity 0.5s ease-in-out; font-family: 'Inter',
+      sans-serif; } .message-box.error { background-color: #f44336; /* Warna
+      merah untuk error */ } .message-box.show { display: block; opacity: 1; }
+    </style>
+  </head>
+  <body class="text-gray-800">
+
+    <div id="messageBox" class="message-box"></div>
+    <div class="flex items-center justify-center min-h-screen w-full p-4">
+      <div
+        class="flex flex-col items-center justify-center w-full max-w-sm rounded-xl shadow-lg p-8 bg-cover"
+        style="background-image: url('/image/bg-form login.jpg');"
+      >
+        <div
+          id="register-form-container"
+          class="w-full text-center bg-white/30 backdrop-blur-sm rounded-xl p-6"
+          enctype="multipart/form-data"
+        >
+          <h1 class="text-3xl font-bold text-gray-900 mb-6">Daftar</h1>
+          <form id="registerForm" method="post" action="/register" enctype="multipart/form-data">
+            <div class="mb-2">
+              <label for="fullname" class="sr-only">Nama Lengkap</label>
+              <input
+                type="text"
+                id="fullname"
+                name="fullname"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-gray-400"
+                placeholder="Nama Lengkap"
+              />
+            </div>
+            <div class="mb-2">
+              <label for="email" class="sr-only">Email</label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-gray-400"
+                placeholder="Email"
+              />
+            </div>
+            <div class="mb-2">
+              <label for="password" class="sr-only">Kata Sandi</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-gray-400"
+                placeholder="Kata Sandi"
+              />
+            </div>
+            <div class="mb-4">
+              <label for="confirm_password" class="sr-only">Konfirmasi Kata
+                Sandi</label>
+              <input
+                type="password"
+                id="confirm_password"
+                name="confirm_password"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-gray-400"
+                placeholder="Konfirmasi Kata Sandi"
+              />
+            </div>
+            <div class="mb-4">
+              <label
+                for="profile_image"
+                class="block text-left text-sm text-gray-600 mb-1"
+              >Upload Foto Profil</label>
+              <input
+                type="file"
+                id="profile_image"
+                name="profile_image"
+                accept="image/*"
+                class="w-full px-3 py-2 border border-gray-300 rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-gray-400"
+              />
+            </div>
+
+            <button
+              type="submit"
+              class="w-full py-2 px-4 text-white font-semibold rounded-md instagram-button transition duration-200"
+            >
+              Daftar
+            </button>
+          </form>
+        </div>
+
+        <div class="bg-white p-4 rounded-xl shadow-lg w-full text-center mt-4">
+          <p class="text-sm text-gray-700">
+            Sudah punya akun?
+            <a
+              href="/login"
+              class="text-blue-600 font-semibold hover:underline"
+            >Masuk</a>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script src="/assets/js/register.js"></script>
+  </body>
+</html>

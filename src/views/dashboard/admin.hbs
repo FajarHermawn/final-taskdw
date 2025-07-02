@@ -1,0 +1,514 @@
+<!-- Admin Panel dengan Tampilan Tabel dan Modal Upload -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+   <!-- Header -->
+    <div class="px-3 py-2">
+      <div class="flex justify-between items-center">
+        {{#if profileImage}}
+  <a href="{{profileImage}}" class="ml-5">
+    <img src="{{profileImage}}" alt="Foto Profil" class="w-10 h-10 rounded-full object-cover border-2 border-gray-300">
+  </a>
+{{else}}
+  <a href="/dashboard" class="ml-5 w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold">
+    ?
+  </a>
+{{/if}}
+        <div class="flex items-center space-x-4">
+          <form action="/logout" method="POST" class="inline-block">
+            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2 rounded-lg font-medium">Logout</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Greeting -->
+    <section id="greeting" class="mb-10 text-center">
+      <h1 class="text-5xl font-bold mb-4">Halo, <span class="text-blue-600">{{fullname}}</span>! 👋</h1>
+      <p class="text-xl text-gray-600">Selamat datang di Dashboard Admin.</p>
+    </section>
+
+
+    <!-- Section: Tech Stack -->
+    <section class="mb-20">
+  <div class="mb-6 flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-gray-800">Tech Stack</h2>
+    <button onclick="openTechStackModal('techStackModal')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+      + Upload Baru
+    </button>
+  </div>
+  <div class="bg-white shadow-lg rounded-lg p-6">
+    <table class="min-w-full text-left text-gray-700">
+      <thead>
+        <tr>
+          <th class="py-3 px-4 border-b bg-gray-100 text-sm font-semibold">No</th>
+          <th class="py-3 px-4 border-b bg-gray-100 text-sm font-semibold">Nama</th>
+          <th class="py-3 px-4 border-b bg-gray-100 text-sm font-semibold">Logo</th>
+          <th class="py-3 px-4 border-b bg-gray-100 text-sm font-semibold">Aksi</th>
+        </tr>
+      </thead>
+      <tbody>
+    {{#each techStacks}}
+    <tr>
+      <td class="py-3 px-4 border-b text-sm">{{inc @index}}</td>
+      <td class="py-3 px-4 border-b text-sm">{{this.name}}</td>
+      <td class="py-3 px-4 border-b text-sm">
+        <img src="{{this.logo_path}}" alt="{{this.name}} Logo" class="h-8 w-8 object-contain">
+      </td>
+      <td class="py-3 px-4 border-b text-sm">
+        <div class="flex items-center gap-2">
+          <button
+            class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600 edit-techstack-button"
+            data-id="{{this.id}}"
+            data-name="{{this.name}}"
+            data-logo="{{this.logo_path}}"
+            onclick="openEditTechStackModal(this)"
+          >
+            edit
+          </button>
+          <form action="/dashboard/techstack/delete/{{this.id}}" method="POST" class="inline-block">
+            <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600">
+              Hapus
+            </button>
+          </form>
+        </div>
+      </td>
+    </tr>
+    {{/each}}
+  </tbody>
+    </table>
+  </div>
+</section>
+
+<div id="techStackModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-lg w-[30rem]">
+    <h2 class="text-xl mb-4" id="techStackModalTitle">Upload Tech Stack</h2>
+    <form action="/dashboard/techstack" method="POST" enctype="multipart/form-data" class="space-y-4" id="techStackForm">
+      <input type="hidden" name="id" id="techStackId" />
+      <input
+        type="text"
+        name="name"
+        placeholder="Nama Tech Stack"
+        class="border px-2 py-1 w-full"
+        required
+        id="techStackName"
+      />
+      <div>
+        <label for="techStackLogo" class="block text-sm font-medium text-gray-700">Logo</label>
+        <input type="file" name="logo" class="border px-2 py-1 w-full" id="techStackLogo">
+        <p class="text-xs text-gray-500 mt-1">Biarkan kosong jika tidak ingin mengubah logo.</p>
+        <img id="currentTechStackLogo" class="hidden h-12 w-12 object-contain mt-2" alt="Current Logo">
+      </div>
+      <div class="flex justify-end gap-2">
+        <button type="button" onclick="closeModal('techStackModal')" class="bg-gray-300 px-4 py-2 rounded">Batal</button>
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded" id="submitTechStackButton">Upload</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+    <section class="mb-20">
+  <div class="mb-6 flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-gray-800">Work Experience</h2>
+    <button onclick="openModal('expModal')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+      + Upload Baru
+    </button>
+  </div>
+  <div class="bg-white shadow-lg rounded-lg p-6">
+    <table class="min-w-full text-left text-gray-700">
+      <thead>
+        <tr>
+          <th class="py-3 px-4 border-b bg-gray-100 text-sm font-semibold">No</th>
+          <th class="py-3 px-4 border-b bg-gray-100 text-sm font-semibold">logo</th>
+          <th class="py-3 px-4 border-b bg-gray-100 text-sm font-semibold">Judul</th>
+          <th class="py-3 px-4 border-b bg-gray-100 text-sm font-semibold">Perusahaan</th>
+          <th class="py-3 px-4 border-b bg-gray-100 text-sm font-semibold">Durasi</th>
+          <th class="py-3 px-4 border-b bg-gray-100 text-sm font-semibold">Aksi</th>
+        </tr>
+      </thead>
+       <tbody>
+    {{#each workExperiences}}
+    <tr>
+      <td class="py-3 px-4 border-b text-sm">{{inc @index}}</td>
+       <td class="py-3 px-4 border-b text-sm">
+        <img src="{{this.company_logo_path}}" alt="{{this.name}} Logo" class="h-8 w-8 object-contain">
+      </td>
+      <td class="py-3 px-4 border-b text-sm">{{this.title}}</td>
+      <td class="py-3 px-4 border-b text-sm">{{this.company}}</td>
+      <td class="py-3 px-4 border-b text-sm">{{this.duration_text}}</td>
+      <td class="py-3 px-4 border-b text-sm">
+        <div class="flex items-center gap-2">
+          <button
+            class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600 edit-button"
+            data-id="{{this.id}}"
+            data-title="{{this.title}}"
+            data-company="{{this.company}}"
+            data-duration="{{this.duration_text}}"
+            data-description="{{this.description}}"
+            data-logo="{{this.company_logo_path}}"
+            onclick="openEditModal(this)"
+          >
+            edit
+          </button>
+          <form action="/dashboard/experience/delete/{{this.id}}" method="POST" class="inline-block">
+            <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600">
+              Hapus
+            </button>
+          </form>
+        </div>
+      </td>
+    </tr>
+    {{/each}}
+  </tbody>
+    </table>
+  </div>
+</section>
+
+<div id="expModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-lg w-[30rem]">
+    <h2 class="text-xl mb-4" id="modalTitle">Upload Pengalaman Kerja</h2>
+    <form action="/dashboard/experience" method="POST" enctype="multipart/form-data" class="space-y-4" id="expForm">
+      <input type="hidden" name="_method" value="POST" id="formMethod" />
+      <input type="hidden" name="id" id="experienceId" />
+      <input
+        type="text"
+        name="title"
+        placeholder="Judul"
+        class="border px-2 py-1 w-full"
+        required
+        id="expTitle"
+      />
+      <input
+        type="text"
+        name="company"
+        placeholder="Perusahaan"
+        class="border px-2 py-1 w-full"
+        required
+        id="expCompany"
+      />
+      <input
+        type="text"
+        name="duration_text"
+        placeholder="Durasi"
+        class="border px-2 py-1 w-full"
+        required
+        id="expDuration"
+      />
+      <textarea
+        name="description"
+        placeholder="Deskripsi"
+        class="border px-2 py-1 w-full"
+        rows="3"
+        required
+        id="expDescription"
+      ></textarea>
+      <div>
+        <label for="expImage" class="block text-sm font-medium text-gray-700">Gambar Logo</label>
+        <input type="file" name="image" class="border px-2 py-1 w-full" id="expImage" />
+        <p class="text-xs text-gray-500 mt-1">Biarkan kosong jika tidak ingin mengubah logo.</p>
+        <img id="currentExpLogo" class="hidden h-16 w-16 object-contain mt-2" alt="Current Logo">
+      </div>
+
+      <div class="flex justify-end gap-2">
+        <button type="button" onclick="closeModal('expModal')" class="bg-gray-300 px-4 py-2 rounded">
+          Batal
+        </button>
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded" id="submitButton">
+          Upload
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+     
+    <!-- Section: Projects -->
+    <section class="mb-20">
+  <div class="mb-6 flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-gray-800">My Projects</h2>
+    <button onclick="openProjectModal('projectModal')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">+ Upload Baru</button>
+  </div>
+  <div class="bg-white shadow-lg rounded-lg p-6">
+    <table class="min-w-full text-left text-gray-700">
+      <thead>
+        <tr>
+          <th class="py-3 px-4 border-b bg-gray-100 text-sm font-semibold">No</th>
+          <th class="py-3 px-4 border-b bg-gray-100 text-sm font-semibold">Proyek</th>
+          <th class="py-3 px-4 border-b bg-gray-100 text-sm font-semibold">Judul</th>
+          <th class="py-3 px-4 border-b bg-gray-100 text-sm font-semibold">Deskripsi</th>
+          <th class="py-3 px-4 border-b bg-gray-100 text-sm font-semibold">Aksi</th>
+        </tr>
+      </thead>
+     <tbody>
+    {{#each projects}}
+    <tr>
+      <td class="py-3 px-4 border-b text-sm">{{inc @index}} </td>
+       <td class="py-3 px-4 border-b text-sm">
+        <img src="{{this.image_path}}" alt="{{this.name}} Logo" class="h-8 w-8 object-contain">
+      </td>
+      <td class="py-3 px-4 border-b text-sm">{{this.title}}</td>  
+      <td class="py-3 px-4 border-b text-sm text-justify">{{this.description}}</td>
+      <td class="py-3 px-4 border-b text-sm">
+        <div class="flex items-center gap-2">
+          <button
+            class="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600 edit-project-button"
+            data-id="{{this.id}}"
+            data-title="{{this.title}}"
+            data-description="{{this.description}}"
+            data-techstack="{{this.tech_stack}}"
+            data-repo="{{this.repo_link}}"
+            data-demo="{{this.demo_link}}"
+            data-image="{{this.image_path}}"
+            onclick="openEditProjectModal(this)"
+          >
+            edit
+          </button>
+          <form action="/dashboard/project/delete/{{this.id}}" method="POST" class="inline-block">
+            <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600">
+              Hapus
+            </button>
+          </form>
+        </div>
+      </td>
+    </tr>
+    {{/each}}
+  </tbody>
+    </table>
+  </div>
+</section>
+
+<div id="projectModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-lg w-[30rem]">
+    <h2 class="text-xl mb-4" id="projectModalTitle">Upload Project Baru</h2>
+    <form action="/dashboard/project" method="POST" enctype="multipart/form-data" class="space-y-4" id="projectForm">
+      <input type="hidden" name="id" id="projectId" />
+      <input type="text" name="title" placeholder="Judul Proyek" class="border px-2 py-1 w-full" required id="projectTitle">
+      <textarea name="description" placeholder="Deskripsi" class="border px-2 py-1 w-full" rows="3" required id="projectDescription"></textarea>
+      <input type="text" name="tech_stack" placeholder="Tech stack" class="border px-2 py-1 w-full" id="projectTechStack">
+      <input type="text" name="repo_link" placeholder="Repository URL" class="border px-2 py-1 w-full" id="projectRepoLink">
+      <input type="text" name="demo_link" placeholder="Demo URL" class="border px-2 py-1 w-full" id="projectDemoLink">
+      <div>
+        <label for="projectImage" class="block text-sm font-medium text-gray-700">Gambar Proyek</label>
+        <input type="file" name="image" class="border px-2 py-1 w-full" id="projectImage">
+        <p class="text-xs text-gray-500 mt-1">Biarkan kosong jika tidak ingin mengubah gambar.</p>
+        <img id="currentProjectImage" class="hidden h-20 w-20 object-contain mt-2" alt="Current Project Image">
+      </div>
+      <div class="flex justify-end gap-2">
+        <button type="button" onclick="closeModal('projectModal')" class="bg-gray-300 px-4 py-2 rounded">Batal</button>
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded" id="submitProjectButton">Upload</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+  </div>
+
+  <!-- Script Modal -->
+  <script>
+  // Fungsi openModal dan closeModal
+  function openModal(id) {
+    document.getElementById(id).classList.remove("hidden");
+    document.getElementById(id).classList.add("flex");
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.add("hidden");
+    document.getElementById(id).classList.remove("flex");
+  }
+
+// --- Tech Stack Modal Functions ---
+  const techStackModal = document.getElementById('techStackModal');
+  const techStackModalTitle = document.getElementById('techStackModalTitle');
+  const techStackForm = document.getElementById('techStackForm');
+  const techStackIdInput = document.getElementById('techStackId');
+  const techStackNameInput = document.getElementById('techStackName');
+  const techStackLogoInput = document.getElementById('techStackLogo');
+  const currentTechStackLogoImg = document.getElementById('currentTechStackLogo');
+  const submitTechStackButton = document.getElementById('submitTechStackButton');
+
+  // open the tech stack modal 
+  function openTechStackModal(modalId) {
+    // Reset form untuk uploadan baru
+    techStackModalTitle.textContent = 'Upload Tech Stack';
+    submitTechStackButton.textContent = 'Upload';
+    techStackForm.action = '/dashboard/techstack';
+    techStackForm.reset();
+    techStackIdInput.value = '';
+    currentTechStackLogoImg.classList.add('hidden');
+    openModal(modalId);
+  }
+
+  // Function to open the tech stack modal in edit mode
+  function openEditTechStackModal(buttonElement) {
+    const id = buttonElement.dataset.id;
+    const name = buttonElement.dataset.name;
+    const logoPath = buttonElement.dataset.logo;
+
+    // Populate form fields
+    techStackIdInput.value = id;
+    techStackNameInput.value = name;
+
+    // Show current logo if available
+    if (logoPath && logoPath !== 'null') { // Check for actual path
+        currentTechStackLogoImg.src = logoPath;
+        currentTechStackLogoImg.classList.remove('hidden');
+    } else {
+        currentTechStackLogoImg.classList.add('hidden');
+    }
+
+    // Change modal title and button text for editing
+    techStackModalTitle.textContent = 'Edit Tech Stack';
+    submitTechStackButton.textContent = 'Update';
+
+    // Set form action for update
+    techStackForm.action = `/dashboard/techstack/update/${id}`;
+    openModal('techStackModal');
+  }
+
+  // Get references to the form elements in the modal
+  const expModal = document.getElementById('expModal');
+  const modalTitle = document.getElementById('modalTitle');
+  const expForm = document.getElementById('expForm');
+  const experienceIdInput = document.getElementById('experienceId');
+  const expTitleInput = document.getElementById('expTitle');
+  const expCompanyInput = document.getElementById('expCompany');
+  const expDurationInput = document.getElementById('expDuration');
+  const expDescriptionInput = document.getElementById('expDescription');
+  const expImageInput = document.getElementById('expImage'); // Corrected ID here
+  const currentExpLogoImg = document.getElementById('currentExpLogo'); // New reference for image tag
+  const formMethodInput = document.getElementById('formMethod');
+  const submitButton = document.getElementById('submitButton');
+
+  // Function to open the modal in edit mode
+  function openEditModal(buttonElement) {
+    const id = buttonElement.dataset.id;
+    const title = buttonElement.dataset.title;
+    const company = buttonElement.dataset.company;
+    const duration = buttonElement.dataset.duration;
+    const description = buttonElement.dataset.description;
+    const logoPath = buttonElement.dataset.logo; // Get the logo path from data-attribute
+
+    experienceIdInput.value = id;
+    expTitleInput.value = title;
+    expCompanyInput.value = company;
+    expDurationInput.value = duration;
+    expDescriptionInput.value = description;
+
+    // Display current logo if available
+    if (logoPath && logoPath !== 'null' && logoPath !== 'undefined') {
+        currentExpLogoImg.src = logoPath;
+        currentExpLogoImg.classList.remove('hidden'); // Show the image
+    } else {
+        currentExpLogoImg.classList.add('hidden'); // Hide if no logo
+    }
+
+    modalTitle.textContent = 'Edit Pengalaman Kerja';
+    submitButton.textContent = 'Update';
+
+    expForm.action = `/dashboard/experience/update/${id}`;
+    formMethodInput.value = 'POST'; // Keep POST for form submission
+
+    // Clear the file input field (optional, but good for UX)
+    expImageInput.value = '';
+
+    openModal('expModal');
+  }
+
+  // Event listener for the "Upload Baru" button to reset the form for new uploads
+  document.querySelector('button[onclick="openModal(\'expModal\')"]').addEventListener('click', function() {
+    modalTitle.textContent = 'Upload Pengalaman Kerja';
+    submitButton.textContent = 'Upload';
+    expForm.action = '/dashboard/experience';
+    formMethodInput.value = 'POST';
+    expForm.reset();
+    experienceIdInput.value = '';
+    // Also hide the current logo when opening for a new upload
+    currentExpLogoImg.classList.add('hidden');
+    expImageInput.value = ''; // Ensure file input is clear
+  });
+
+  // Event listener untuk tombol "Upload Baru"
+  document.querySelector('button[onclick="openModal(\'expModal\')"]').addEventListener('click', function() {
+    modalTitle.textContent = 'Upload Pengalaman Kerja';
+    submitButton.textContent = 'Upload';
+    expForm.action = '/dashboard/experience'; // Kembali ke action upload
+    formMethodInput.value = 'POST'; // Kembali ke method POST
+    expForm.reset(); // Kosongkan semua field form
+    experienceIdInput.value = ''; // Pastikan ID kosong untuk upload baru
+  });
+
+  // --- Project Modal Functions ---
+  const projectModal = document.getElementById('projectModal');
+  const projectModalTitle = document.getElementById('projectModalTitle');
+  const projectForm = document.getElementById('projectForm');
+  const projectIdInput = document.getElementById('projectId');
+  const projectTitleInput = document.getElementById('projectTitle');
+  const projectDescriptionInput = document.getElementById('projectDescription');
+  const projectTechStackInput = document.getElementById('projectTechStack');
+  const projectRepoLinkInput = document.getElementById('projectRepoLink');
+  const projectDemoLinkInput = document.getElementById('projectDemoLink');
+  const projectImageInput = document.getElementById('projectImage');
+  const currentProjectImageImg = document.getElementById('currentProjectImage');
+  const submitProjectButton = document.getElementById('submitProjectButton');
+
+  // Function to open the project modal (for new upload)
+  function openProjectModal(modalId) {
+    // Reset form for new upload
+    projectModalTitle.textContent = 'Upload Project Baru';
+    submitProjectButton.textContent = 'Upload';
+    projectForm.action = '/dashboard/project'; // Original upload endpoint
+    projectForm.reset(); // Clears all form fields
+    projectIdInput.value = ''; // Ensure ID is empty for new uploads
+    currentProjectImageImg.classList.add('hidden'); // Hide current image preview
+
+    openModal(modalId);
+  }
+
+  // Function to open the project modal in edit mode
+  function openEditProjectModal(buttonElement) {
+    const id = buttonElement.dataset.id;
+    const title = buttonElement.dataset.title;
+    const description = buttonElement.dataset.description;
+    const techStack = buttonElement.dataset.techstack;
+    const repoLink = buttonElement.dataset.repo;
+    const demoLink = buttonElement.dataset.demo;
+    const imagePath = buttonElement.dataset.image;
+
+    // Populate form fields
+    projectIdInput.value = id;
+    projectTitleInput.value = title;
+    projectDescriptionInput.value = description;
+    projectTechStackInput.value = techStack;
+    projectRepoLinkInput.value = repoLink;
+    projectDemoLinkInput.value = demoLink;
+
+    // Show current image if available
+    if (imagePath && imagePath !== 'null' && imagePath !== 'undefined') { // Check for actual path
+        currentProjectImageImg.src = imagePath;
+        currentProjectImageImg.classList.remove('hidden');
+    } else {
+        currentProjectImageImg.classList.add('hidden');
+    }
+
+    // Change modal title and button text for editing
+    projectModalTitle.textContent = 'Edit Project';
+    submitProjectButton.textContent = 'Update';
+
+    // Set form action for update
+    projectForm.action = `/dashboard/project/update/${id}`;
+
+    openModal('projectModal');
+  }
+
+  // Event listener for the main "Upload Baru" button for Projects
+  document.querySelector('button[onclick="openProjectModal(\'projectModal\')"]').addEventListener('click', function() {
+    openProjectModal('projectModal'); // Call the specific openProjectModal to reset
+  });
+</script>
+</body>
+</html>
